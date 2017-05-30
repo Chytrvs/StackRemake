@@ -14,16 +14,23 @@ public class StackController : MonoBehaviour {
     public float DisplacementTolerance;
     private float MaxTileScale;
     private GameObject Leftover;
+    private float hue;
 	// Use this for initialization
 	void Start () {
-        Tile = transform.GetChild(0).gameObject;
+        hue = Random.Range(0, 10) * 0.1f;
+        Tile = transform.GetChild(transform.childCount-1).gameObject;
         MaxTileScale = Tile.transform.localScale.x;
         HighestTile = Tile;
         SpawnNextTile();
+        foreach(Transform tile in transform)
+        {
+            SetColor(tile.gameObject);
+        }
 	}
 	
 	// Update is called once per frame
 	void Update () {
+        //SetColor();
         InputHandle();
         MoveStackDown();
         if (isMovingOnXaxis)
@@ -58,7 +65,7 @@ public class StackController : MonoBehaviour {
             else if (Displacement > HighestTile.transform.localScale.x)
             {
                 Debug.Log("lose");
-                MovingTile.AddComponent<Rigidbody>();
+               
             }
             else
             {
@@ -118,10 +125,12 @@ public class StackController : MonoBehaviour {
         if (isMovingOnXaxis)
         {
         MovingTile = Instantiate(HighestTile,HighestTile.transform.position+new Vector3(-HighestTile.transform.localScale.x,1,0), Quaternion.identity, transform) as GameObject;
+            SetColor(MovingTile);
         }
         else
         {
         MovingTile = Instantiate(HighestTile, HighestTile.transform.position + new Vector3(0, 1, -HighestTile.transform.localScale.z), Quaternion.identity, transform) as GameObject;
+            SetColor(MovingTile);
         }
         EndPos += Vector3.down;
     }
@@ -136,5 +145,21 @@ public class StackController : MonoBehaviour {
     void MoveTileZ() //Moves tile back and forth on Z axis
     {
         MovingTile.transform.position = new Vector3(MovingTile.transform.position.x, MovingTile.transform.position.y, HighestTile.transform.position.z + Mathf.PingPong(Time.time * TileSpeed, MaxTileScale*2) - MaxTileScale);
+    }
+    void SetColor(GameObject tile)
+    {
+        if (hue < 1)
+        {
+        hue += 0.015f;
+        }
+        else
+        {
+            hue = 0;
+        }
+
+        
+        float sat=0.6f;
+        float val=0.6f;
+        tile.GetComponent<Renderer>().material.color =Color.HSVToRGB(hue, sat, val);
     }
 }
