@@ -46,7 +46,7 @@ public class StackController : MonoBehaviour {
         //SetColor();
         if (!IsGameOver)
         {
-            InputHandle();
+            TouchInputHandle();
             MoveStackDown();
             if (combo >= 3)
                 HighestTile.transform.localScale = Vector3.Lerp(HighestTile.transform.localScale, DesiredScale,  TileScaleSpeed * Time.deltaTime);
@@ -69,7 +69,22 @@ public class StackController : MonoBehaviour {
         if (Input.GetMouseButtonDown(0))
         {
             PlaceTile();
+            if(!IsGameOver)
             SpawnNextTile();
+        }
+    }
+    void TouchInputHandle()
+    {
+        if (Input.touchCount > 0)
+        {
+            Touch tap = Input.GetTouch(0);
+            if (tap.phase == TouchPhase.Began)
+            {
+                PlaceTile();
+                if (!IsGameOver)
+                    SpawnNextTile();
+            }
+
         }
     }
     void PlaceTile()
@@ -82,11 +97,12 @@ public class StackController : MonoBehaviour {
                 MovingTile.transform.position = new Vector3(HighestTile.transform.position.x, MovingTile.transform.position.y, HighestTile.transform.position.z);
                 HighestTile = MovingTile;
                 isMovingOnXaxis = !isMovingOnXaxis;
-                HighestTile.GetComponent<ParticleSystem>().Emit(1000);
+                HighestTile.GetComponent<ParticleSystem>().Emit(500);
                 combo++;
             }
             else if (Displacement > HighestTile.transform.localScale.x)
             {
+                MovingTile.AddComponent<Rigidbody>();
                 GameOver();
             }
             else
@@ -117,13 +133,14 @@ public class StackController : MonoBehaviour {
                 MovingTile.transform.position = new Vector3(HighestTile.transform.position.x, MovingTile.transform.position.y, HighestTile.transform.position.z);
                 HighestTile = MovingTile;
                 isMovingOnXaxis = !isMovingOnXaxis;
-                HighestTile.GetComponent<ParticleSystem>().Emit(1000);
+                HighestTile.GetComponent<ParticleSystem>().Emit(500);
                 combo++;
             }
             else if (Displacement > HighestTile.transform.localScale.z)
             {
+                MovingTile.AddComponent<Rigidbody>();
                 GameOver();
-                combo = 0;
+                
             }
             else
             {
